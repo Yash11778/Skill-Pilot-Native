@@ -1,0 +1,17 @@
+﻿app/(dashboard)/index.tsx(104,15): error TS2322: Type 'unknown[]' is not assignable to type 'string[]'.
+  Type 'unknown' is not assignable to type 'string'.
+src/services/api.ts(23,33): error TS18048: 'config.method' is possibly 'undefined'.
+src/store/slices/aiSlice.ts(20,30): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+src/store/slices/assessmentSlice.ts(63,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/store/slices/assessmentSlice.ts(75,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/store/slices/authSlice.ts(106,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/store/slices/authSlice.ts(128,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/store/slices/authSlice.ts(145,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/store/slices/uiSlice.ts(18,32): error TS2345: Argument of type 'any' is not assignable to parameter of type 'never'.
+src/store/slices/uiSlice.ts(30,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'WritableNonArrayDraft<{}>'.
+src/store/slices/uiSlice.ts(34,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'WritableNonArrayDraft<{}>'.
+src/store/slices/uiSlice.ts(41,11): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'WritableNonArrayDraft<{}>'.
+src/store/slices/uiSlice.ts(42,9): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'WritableNonArrayDraft<{}>'.
+src/store/slices/userSlice.ts(44,25): error TS2698: Spread types may only be created from object types.
+src/store/slices/userSlice.ts(60,9): error TS2322: Type 'string' is not assignable to type 'null'.
+src/store/slices/userSlice.ts(73,9): error TS2322: Type 'string' is not assignable to type 'null'.
