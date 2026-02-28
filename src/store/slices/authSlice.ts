@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authService from '../../services/authService';
+import cache from '../../utils/cache';
 
 interface AuthState {
   user: any | null;
@@ -82,6 +83,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.error = null;
       AsyncStorage.removeItem('token');
+      cache.clear(); // clear all cached API data on logout
     },
     clearError: (state) => {
       state.error = null;

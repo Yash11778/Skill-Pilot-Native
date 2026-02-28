@@ -1,9 +1,14 @@
 import api from './api';
+import cache from '../utils/cache';
 
 const mentorService = {
-    // Get available mentors
+    // Get available mentors (cached 10 min)
     getMentors: async (filters: any = {}) => {
+        const key = `mentor:list:${JSON.stringify(filters)}`;
+        const cached = await cache.get(key);
+        if (cached) return cached;
         const response = await api.get('/mentor', { params: filters });
+        await cache.set(key, response.data, 10 * 60 * 1000);
         return response.data;
     },
 

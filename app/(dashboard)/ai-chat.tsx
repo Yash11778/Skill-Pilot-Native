@@ -12,7 +12,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import aiService from '../../src/services/aiService';
+import { API_URL } from '../../src/config/network-config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const QUICK_QUESTIONS = [
   'What career suits me?',
@@ -34,18 +35,32 @@ export default function AIChatScreen() {
 
   const callAI = async (userMsg: string, history: Message[]): Promise<string> => {
     try {
+      const token = await AsyncStorage.getItem('token');
       const conversationHistory = history.slice(-10).map(m => ({
-        role: m.isUser ? 'user' as const : 'assistant' as const,
+        role: m.isUser ? 'user' : 'assistant',
         content: m.text,
       }));
-      const response = await aiService.chatWithAI(userMsg, conversationHistory);
-      if (response.success && response.data?.response) {
-        return response.data.response;
+
+      const response = await fetch(`${API_URL}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ message: userMsg, conversationHistory }),
+        signal: AbortSignal.timeout(60000),
+      });
+
+      const data = await response.json();
+      if (data?.success && data?.data?.response) {
+        return data.data.response;
       }
-      return response.data?.response || "I couldn't generate a response. Please try again.";
+      return "I couldn't generate a response right now. Please try again.";
     } catch (error: any) {
-      console.error('AI Chat Error:', error);
-      return "I'm having trouble connecting right now. Please try again in a moment. In the meantime, feel free to explore our Assessments and Courses sections!";
+      if (error?.name === 'TimeoutError') {
+        return "Server is starting up. Please send your message again in a moment!";
+      }
+      return "I'm having trouble connecting right now. Please check your internet and try again.";
     }
   };
 

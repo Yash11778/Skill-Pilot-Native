@@ -4,7 +4,7 @@ const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
-router.use(protect);
+// NOTE: protect is applied per-route, not globally, so chat works even with expired tokens
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const AI_MODELS = ['google/gemini-2.0-flash-exp:free', 'meta-llama/llama-3.2-3b-instruct:free', 'openai/gpt-3.5-turbo'];
@@ -37,7 +37,7 @@ async function callAI(messages, maxTokens = 500) {
 }
 
 // POST /api/ai/career-advice
-router.post('/career-advice', async (req, res, next) => {
+router.post('/career-advice', protect, async (req, res, next) => {
     try {
         const { question, context } = req.body;
         if (!question) return res.status(400).json({ success: false, message: 'Question is required' });
@@ -68,14 +68,26 @@ router.post('/career-advice', async (req, res, next) => {
     } catch (error) { next(error); }
 });
 
-// POST /api/ai/chat
+// POST /api/ai/chat  — works with or without auth token
 router.post('/chat', async (req, res, next) => {
     try {
         const { message, conversationHistory } = req.body;
         if (!message) return res.status(400).json({ success: false, message: 'Message is required' });
 
-        const user = await User.findById(req.user.id);
-        const systemPrompt = `You are SkillPilot AI, a friendly and knowledgeable career counselor. The user is a ${user.careerStage || 'student'} with skills in ${user.skills.map(s => s.name).join(', ') || 'various areas'}. Help them with career guidance, skill development, course recommendations, and job search strategies. Be encouraging, practical, and specific in your advice. Keep responses concise and actionable.`;
+        // Try to get user context if token provided (optional)
+        let systemPrompt = `You are SkillPilot AI, a friendly and knowledgeable career counselor. Help users with career guidance, skill development, course recommendations, and job search strategies. Be encouraging, practical, and specific in your advice. Keep responses concise and actionable.`;
+        try {
+            const token = req.headers.authorization?.split(' ')[1];
+            if (token) {
+                const jwt = require('jsonwebtoken');
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const User = require('../models/User');
+                const user = await User.findById(decoded.id);
+                if (user) {
+                    systemPrompt = `You are SkillPilot AI, a friendly and knowledgeable career counselor. The user is a ${user.careerStage || 'student'} with skills in ${user.skills.map(s => s.name).join(', ') || 'various areas'}. Help them with career guidance, skill development, course recommendations, and job search strategies. Be encouraging, practical, and specific in your advice. Keep responses concise and actionable.`;
+                }
+            }
+        } catch (_) { /* use generic prompt if auth fails */ }
 
         const messages = [{ role: 'system', content: systemPrompt }];
         if (Array.isArray(conversationHistory)) {
@@ -98,7 +110,7 @@ router.post('/chat', async (req, res, next) => {
 });
 
 // GET /api/ai/skill-gap/:jobTitle
-router.get('/skill-gap/:jobTitle', async (req, res, next) => {
+router.get('/skill-gap/:jobTitle', protect, async (req, res, next) => {
     try {
         const { jobTitle } = req.params;
         const user = await User.findById(req.user.id);
@@ -127,7 +139,7 @@ router.get('/skill-gap/:jobTitle', async (req, res, next) => {
 });
 
 // GET /api/ai/roadmap/:careerGoal
-router.get('/roadmap/:careerGoal', async (req, res, next) => {
+router.get('/roadmap/:careerGoal', protect, async (req, res, next) => {
     try {
         const { careerGoal } = req.params;
         const user = await User.findById(req.user.id);
@@ -157,7 +169,7 @@ router.get('/roadmap/:careerGoal', async (req, res, next) => {
 });
 
 // GET /api/ai/market-insights
-router.get('/market-insights', async (req, res, next) => {
+router.get('/market-insights', protect, async (req, res, next) => {
     try {
         const { industry, location } = req.query;
 

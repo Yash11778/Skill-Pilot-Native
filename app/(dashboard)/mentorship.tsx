@@ -117,29 +117,9 @@ export default function MentorshipScreen() {
     dispatch(getConnections());
   }, []);
 
-  // Use backend data if available, otherwise fallback
-  const allMentors = (backendMentors && backendMentors.length > 0)
-    ? backendMentors.map((m: any, i: number) => ({
-      id: m._id || i + 1,
-      name: `${m.firstName || ''} ${m.lastName || ''}`.trim() || 'Mentor',
-      title: m.currentRole || 'Professional',
-      company: '',
-      rating: 4.8,
-      sessions: 0,
-      specialty: m.skills?.[0]?.name?.toLowerCase() || 'general',
-      expertise: m.skills?.map((s: any) => s.name?.toLowerCase()) || [],
-      skills: m.skills?.map((s: any) => s.name) || [],
-      bio: '',
-      availability: 'Available',
-      languages: ['English'],
-      experience: `${m.experience?.length || 0}+ years`,
-      responseTime: '< 4 hours',
-      education: '',
-      pricePerSession: 0,
-      avatar: mentorAvatars[i % mentorAvatars.length],
-      color: mentorColors[i % mentorColors.length],
-    }))
-    : fallbackMentors;
+  // Always use hardcoded fallbackMentors (Yash, Maithili, Harkirat)
+  // Backend mentor data is skipped to ensure correct names/profiles are shown
+  const allMentors = fallbackMentors;
 
   const filtered =
     selectedExpertise === 'all'

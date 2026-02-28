@@ -1,15 +1,23 @@
 import api from './api';
+import cache from '../utils/cache';
 
 const courseService = {
-    // Get course recommendations
+    // Get course recommendations (cached 10 min)
     getRecommendations: async () => {
+        const cached = await cache.get('course:recommendations');
+        if (cached) return cached;
         const response = await api.get('/course/recommendations');
+        await cache.set('course:recommendations', response.data, 10 * 60 * 1000);
         return response.data;
     },
 
-    // Search courses with filters
+    // Search courses with filters (cached 5 min per filter combo)
     searchCourses: async (filters: any = {}) => {
+        const key = `course:search:${JSON.stringify(filters)}`;
+        const cached = await cache.get(key);
+        if (cached) return cached;
         const response = await api.get('/course/search', { params: filters });
+        await cache.set(key, response.data, 5 * 60 * 1000);
         return response.data;
     },
 
