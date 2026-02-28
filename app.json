@@ -36,6 +36,15 @@
     "scheme": "skillpilot",
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "fbb05998-0f5d-42c2-8d3d-bb68c896881b"
+      }
+    },
+    "owner": "yash_11778"
   }
 }
