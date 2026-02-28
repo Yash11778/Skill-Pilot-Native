@@ -5,12 +5,13 @@ import { API_URL } from '../config/network-config';
 const API_BASE_URL = API_URL;
 
 // Create axios instance with a generous timeout
+// 60s to handle Render free-tier cold starts (can take up to 50s)
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 seconds — enough for cold-start
+  timeout: 60000,
 });
 
 // ─── Request interceptor ─────────────────────────────────────────────────────
@@ -63,7 +64,7 @@ api.interceptors.response.use(
     // ── Map raw network/timeout errors to user-friendly messages ─────────────
     if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       error.userMessage =
-        'Server is taking too long to respond. Please check your internet connection and try again.';
+        'Server is starting up (first request takes ~30s). Please try again.';
     } else if (
       error.code === 'ECONNREFUSED' ||
       error.code === 'ERR_NETWORK' ||
