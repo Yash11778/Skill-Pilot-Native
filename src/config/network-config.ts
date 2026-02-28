@@ -4,7 +4,7 @@ const LOCAL_URL = `http://${LOCAL_IP}:5001/api`;
 
 // Production backend URL (deployed on Render)
 // Replace with your actual Render URL after deploying:  https://skillpilot-backend.onrender.com
-const PRODUCTION_URL = 'https://skillpilot-backend.onrender.com/api';
+const PRODUCTION_URL = 'https://skill-pilot-native.onrender.com/api';
 
 // In development (__DEV__ = true) use local backend
 // In production APK build (__DEV__ = false) use hosted backend
